@@ -2,7 +2,7 @@ import os
 import random
 import string
 from shutil import copy2
-
+from datetime import datetime
 
 class GenerateRandom:
 
@@ -14,11 +14,12 @@ class GenerateRandom:
     @staticmethod
     def log(path, filename, key):
         """ This method simply logs out the created files based on whether they have identical or different content"""
+        current_time = datetime.now().strftime("%H:%M:%S")
         with open(os.path.join(path, 'FILES_INFO.txt'), 'a') as f:
             if key == 'another':
-                f.write(f' DIFFERENT CONTENT --- {filename}\n')
+                f.write(f'[ {current_time} ] DIFFERENT CONTENT --- {filename}\n')
             else:
-                f.write(f' IDENTICAL CONTENT --- {filename}\n')
+                f.write(f'[ {current_time} ] IDENTICAL CONTENT --- {filename}\n')
 
     def run(self, max_depth, max_files, max_dirs):
         """This method runs the other methods"""
