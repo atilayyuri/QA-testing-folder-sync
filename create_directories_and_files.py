@@ -18,7 +18,7 @@ class GenerateRandom:
         with open(os.path.join(path, 'FILES_INFO.txt'), 'a') as f:
             if key == 'another':
                 f.write(f'[ {current_time} ] DIFFERENT CONTENT --- {filename}\n')
-            else:
+            elif key == 'same':
                 f.write(f'[ {current_time} ] IDENTICAL CONTENT --- {filename}\n')
 
     def run(self, max_depth, max_files, max_dirs):
