@@ -30,7 +30,7 @@ class GenerateRandom:
 
         self.generate_random_directories(path_1, path_2, max_depth, max_files, max_dirs)
 
-        return self.count_files_dirs(path_1), self.count_files_dirs(path_2), self.intersection_list
+        return self.count_files_dirs_recurs(path_1), self.count_files_dirs_recurs(path_2), self.intersection_list
 
     @staticmethod
     def count_files_dirs(path):
@@ -41,6 +41,18 @@ class GenerateRandom:
             dirs += len(dirnames)
             files += len(filenames)
             break
+
+        return [files, dirs]
+
+    @staticmethod
+    def count_files_dirs_recurs(path):
+        """This method counts the directories and files in a given path"""
+        files = 0
+        dirs = 0
+        for dirpath, dirnames, filenames in os.walk(path):
+            dirs += len(dirnames)
+            files += len(filenames)
+
 
         return [files, dirs]
 
