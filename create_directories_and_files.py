@@ -4,12 +4,14 @@ import string
 from shutil import copy2
 from datetime import datetime
 
+
 class GenerateRandom:
 
     def __init__(self, path_source, path_replica):
 
         self.path_source = path_source
         self.path_replica = path_replica
+        self.intersection_list = []
 
     @staticmethod
     def log(path, filename, key):
@@ -28,6 +30,8 @@ class GenerateRandom:
 
         self.generate_random_directories(path_1, path_2, max_depth, max_files, max_dirs)
 
+        return self.count_files_dirs(path_1), self.count_files_dirs(path_2), self.intersection_list
+
     @staticmethod
     def count_files_dirs(path):
         """This method counts the directories and files in a given path"""
@@ -39,6 +43,15 @@ class GenerateRandom:
             break
 
         return [files, dirs]
+
+    @staticmethod
+    def create_directory(dir_path):
+        """This method handles error if for any reason directory creation using os.makedirs fails"""
+        try:
+            os.makedirs(dir_path)
+        except OSError as e:
+            print(f"Error creating directory {dir_path}: {e}")
+
 
     def _generate_random_files(self, target_path, target_path_2, num_files):
         """This method generates random files with all same filename
@@ -72,23 +85,46 @@ class GenerateRandom:
                 if self.count_files_dirs(target_path_2)[0] < num_files:
                     # Check if the path exists
                     if not os.path.isdir(os.path.join(target_path_2)):
-                        os.makedirs(target_path_2)
+                        self.create_directory(target_path_2)
                         with open(os.path.abspath(os.path.join(target_path_2, filename)), 'w') as f:
                             f.write(content_2)
 
-                    self.log(self.path_source, os.path.abspath(os.path.join(target_path, filename)), 'another')
+                        self.log(self.path_source, os.path.abspath(os.path.join(target_path, filename)), 'another')
+
+                        # It is observed that os.path.relpath(target_path,self.path_source) command returns
+                        # a path that is either relative directory path or a path starts with ../ due to target_path
+                        # shifting between self.path_source and self.path_replica i.e.
+                        # for C:\Users\user.FBTSB1\OneDrive\Desktop\test_sync_folder\replica_folder\krnvnipivh\fxhnmslvyv\zgbjoxuygw\qnmvtsbdob.txt
+                        # ..\replica_folder\krnvnipivh\fxhnmslvyv\zgbjoxuygw\qnmvtsbdob.txt
+                        # or
+                        # for C:\Users\user.fbtsb1\onedrive\Desktop\test_sync_folder\src_folder\krnvnipivh\pswqloakqm\gipvrelcnr\rivoqxmvgj.txt
+                        # krnvnipivh\pswqloakqm\gipvrelcnr\rivoqxmvgj.txt
+                        dirnames_and_file = os.path.join(os.path.relpath(target_path, self.path_source), filename)
+                        if dirnames_and_file[0:2] == '..':
+                            dirnames_and_file = os.path.join(*dirnames_and_file.split('\\')[2:])
+
+                        self.intersection_list.append(dirnames_and_file)
+
+                continue
 
             # Write another file with same content and filename at path2 based on probability
             dice_roll_2 = random.randint(10, 100)
-            if dice_roll_2 > 10:
+            if dice_roll_2 > 40:
                 # Check if max file is reached
                 if self.count_files_dirs(target_path_2)[0] < num_files:
                     # Check if the path exists
                     if not os.path.isdir(os.path.join(target_path_2)):
-                        os.makedirs(target_path_2)
+                        self.create_directory(target_path_2)
                         copy2(os.path.join(target_path, filename), os.path.join(target_path_2, filename))
 
-                    self.log(self.path_source, os.path.abspath(os.path.join(target_path, filename)), 'same')
+                        self.log(self.path_source, os.path.abspath(os.path.join(target_path, filename)), 'same')
+
+                        dirnames_and_file = os.path.join(os.path.relpath(target_path, self.path_source), filename)
+                        if dirnames_and_file[0:2] == '..':
+                            dirnames_and_file = os.path.join(*dirnames_and_file.split('\\')[2:])
+
+                        self.intersection_list.append(dirnames_and_file)
+
 
     def generate_random_directories(self, path_1, path_2, max_depth, max_files, max_dirs):
         """This method generates random directories and sub-directories in source and replica folders.
@@ -119,7 +155,7 @@ class GenerateRandom:
                     dir_path_2 = os.path.join(copy_path, dir_name)
                     # Create directory if max directory number is not reached at path1
                     if self.count_files_dirs(path)[1] < max_dirs:
-                        os.makedirs(dir_path)
+                        self.create_directory(dir_path)
                         # Populate the directory with random amount of files (0 -- max_files)
                         self._generate_random_files(dir_path, dir_path_2,
                                                     random.randint(0, max_files))
@@ -130,7 +166,7 @@ class GenerateRandom:
                     else:
                         # Create directory if max directory number is not reached at path2
                         if self.count_files_dirs(copy_path)[1] < max_dirs:
-                            os.makedirs(dir_path_2)
+                            self.create_directory(dir_path_2)
                             # Populate the directory with random amount of files (0 -- max_files)
                             self._generate_random_files(dir_path_2, dir_path,
                                                         random.randint(0, max_files))
@@ -142,3 +178,5 @@ class GenerateRandom:
                         if self.count_files_dirs(copy_path)[0] < max_files:
                             self._generate_random_files(copy_path, copy_path,
                                                         random.randint(0, max_files))
+
+
