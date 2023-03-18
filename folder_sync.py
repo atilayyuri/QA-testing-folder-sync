@@ -85,7 +85,7 @@ class FolderSync:
             if not os.path.exists(path2_directories):
                 os.makedirs(path2_directories)
             copy2(os.path.abspath(path1), os.path.abspath(path2))
-            self.log(f' -- Copy -- The file {path1} has been copied', self.log_file_path, 'green')
+            self.log(f' ---- Copy ---- The file {path1} has been copied to replica', self.log_file_path, 'green')
             self.count_file_copied += 1
         except OSError as e:
             self.log(f' Error copying {path1} to {path2}: {e}', self.log_file_path, 'red')
@@ -97,7 +97,7 @@ class FolderSync:
         try:
             os.remove(path)
             self.count_file_removed += 1
-            self.log(f' -- Remove -- The file {path} has been deleted', self.log_file_path, 'orange')
+            self.log(f' -- Remove -- The file {path} has been deleted from replica', self.log_file_path, 'orange')
         except OSError as e:
             self.log(f' Error removing file {path}: {e} ', self.log_file_path, 'red')
 
@@ -174,7 +174,8 @@ class FolderSync:
                     # If the source path does not exist in replica directory
                     else:
                         self.log(
-                            f' -- Create -- A new file has been created at source directory {relative_path_source}',
+                            f' ---- Create ---- A new file has been created at source directory '
+                            f'{os.path.join(self.path_source,relative_path_source)}',
                             self.log_file_path, 'bold')
 
                         diff_to_copy.add(relative_path_source)
