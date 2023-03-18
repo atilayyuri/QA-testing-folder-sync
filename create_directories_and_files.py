@@ -6,6 +6,21 @@ from datetime import datetime
 
 
 class GenerateRandom:
+    """This class runs over the source and replica and populates them based on max_depth, max_files, max_dirs
+    if those directories empty
+
+    max_depth -- defines the maximum number of sub directory levels in a directory
+    max_files -- defines the maximum number of files in a directory
+    max_dirs -- defines the maximum number of directory in a directory
+
+    To test the ability of the FolderSync class (copy detection, content detection if the filename is same)
+    the random file generator has the following abilities
+
+            Creates a file at path1 with content1
+            Creates a file at path2 with content1 -- basically copies
+            Creates a file at path2 with content2 -- to test the content of the file when file paths in source and
+                                                     replica folder matches
+    """
 
     def __init__(self, path_source, path_replica):
 
@@ -141,7 +156,6 @@ class GenerateRandom:
     def generate_random_directories(self, path_1, path_2, max_depth, max_files, max_dirs):
         """This method generates random directories and sub-directories in source and replica folders.
         It also populates those directories with random files in a probabilistic fashion.
-        TODO:Although max depth functionality works, max file needs improvement
         """
         paths = [path_1, path_2]
 
