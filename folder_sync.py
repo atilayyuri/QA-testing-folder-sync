@@ -198,8 +198,8 @@ class FolderSync:
         # current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         with open(filename, 'a') as f:
             f.write(f'{path} , {data}\n')
-
-    def _read_metadata(self, filename):
+    @staticmethod
+    def _read_metadata(filename):
         """ This method simply reads the metadata and deletes it"""
         metadata = {}
         # current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -219,7 +219,6 @@ class FolderSync:
         # Define operation system specific line seperator
         sep = os.sep
         splitted = path.split(sep)
-
 
         if system() == 'Windows':
             special_characters = sep + '/:*?<>|'
@@ -243,15 +242,14 @@ class FolderSync:
 
     def _copy_file(self, path1, path2):
         """This method handles error if for any reason shutil.copy2 fails, logs out to the logfile and console"""
-        # print('path2 original', path2)
-        path2_directories = 'C:\\'+(os.path.join(*path2.split('\\')[1:-1]))
+        path2_directories = ''
+        if system() == 'Windows':
+            path2_directories = 'C:\\' + (os.path.join(*path2.split('\\')[1:-1]))
+        elif system() == 'Linux':
+            path2_directories = os.path.join(*path2.split('/')[1:-1])
 
         try:
-            # print('path1',path1)
-            # print('path2',split_path2[:-1])
             if not os.path.exists(path2_directories):
-                print('yok')
-            #print(os.path.exists(path2_directories))
                 os.makedirs(path2_directories)
             copy2(os.path.abspath(path1), os.path.abspath(path2))
             self.log(f' -- Copy -- The file {path1} has been copied to {path2}', self.log_file_path, 'green')
@@ -267,16 +265,12 @@ class FolderSync:
         """This method handles error if for any reason os.remove fails, logs out to the logfile and console"""
         try:
             os.remove(path)
-            #if path is os.path.join(self.path_replica,'metadata.txt'):
-            #    return
             self.count_file_removed += 1
             self.log(f' -- Remove -- The file {path} has been deleted', self.log_file_path, 'orange')
         except OSError as e:
-            # print(f'{Colors.FAIL} Error removing file {path}: {e} {Colors.ENDC}')
             self.log(f' Error removing file {path}: {e} ', self.log_file_path, 'red')
 
     def check_sys_args(self):
-        # TODO Define point 3) later when you handle logfile question (What if the path_log_file_dir is a path? What should be the correct way to handle this?)
         """This method check system arguments
 
         After checking the paths using check_paths method it checks
@@ -288,64 +282,57 @@ class FolderSync:
 
         """
 
-        paths = [self.path_source, self.path_replica, self.log_file_path]
-        attrs = ['path_source', 'path_replica', 'path_log_file_dir']
+        # paths = [self.path_source, self.path_replica, self.log_file_path]
+        # attrs = ['path_source', 'path_replica', 'path_log_file_dir']
+        #
+        # for path, attr in zip(paths, attrs):
+        #     new_path = self._check_paths(os.path.normpath(os.path.abspath(path)))
+        #     setattr(self, attr, new_path)
 
-        for path, attr in zip(paths, attrs):
-            new_path = self._check_paths(os.path.normpath(os.path.abspath(path)))
-            setattr(self, attr, new_path)
-
-        #error = False
+        # error = False
 
         if not os.path.isdir(self.path_source):
-            #print(f'{Colors.FAIL}Error: Path for source directory {self.path_source} does not exist{Colors.ENDC}')
+            # print(f'{Colors.FAIL}Error: Path for source directory {self.path_source} does not exist{Colors.ENDC}')
             raise ValueError(f"Source directory {self.path_source} does not exist")
-            #error = True
+            # error = True
         if not os.path.isdir(self.path_replica):
-            #print(f'{Colors.FAIL}Error: Path for replica directory {self.path_replica} does not exist{Colors.ENDC}')
+            # print(f'{Colors.FAIL}Error: Path for replica directory {self.path_replica} does not exist{Colors.ENDC}')
             raise ValueError(f"Replica directory {self.path_replica} does not exist")
-            #error = True
+            # error = True
         if self.path_source == self.path_replica:
-            #print(f'{Colors.FAIL}Error: Path for source and replica directory can not be identical{Colors.ENDC}')
+            # print(f'{Colors.FAIL}Error: Path for source and replica directory can not be identical{Colors.ENDC}')
             raise ValueError("Path for source and directory directories are identical")
-            #error = True
+            # error = True
 
         if os.path.isdir(self.log_file_path):
-            #print(f'{Colors.FAIL}Error: Given input {self.log_file_path} is a directory, please provide full path for log file {Colors.ENDC}')
+            # print(f'{Colors.FAIL}Error: Given input {self.log_file_path} is a directory, please provide full path for log file {Colors.ENDC}')
             raise ValueError(f"Given input {self.log_file_path} is a directory, please provide full path for log file")
-            #error = True
+            # error = True
         else:
-            # TODO ?? What if the path_log_file_dir is a path? What should be the correct way to handle this?
             if os.path.exists(self.log_file_path):
-                print(f'{Colors.WARNING}WARNING: Logfile path {self.log_file_path} exists new log will be append to existing file{Colors.ENDC}')
+                print(
+                    f'{Colors.WARNING}WARNING: Logfile path {self.log_file_path} exists new log will be append to existing file{Colors.ENDC}')
 
         if self.sync_interval < 0:
-            #print(f"{Colors.FAIL}Error: Synchronisation interval {self.sync_interval} must be positive integer{Colors.ENDC}")
+            # print(f"{Colors.FAIL}Error: Synchronisation interval {self.sync_interval} must be positive integer{Colors.ENDC}")
             raise ValueError(f"Synchronisation interval {self.sync_interval} must be positive integer")
 
-            #error = True
+            # error = True
 
-#        if error:
-#            return True
-#        else:
-#            return False
+    #        if error:
+    #            return True
+    #        else:
+    #            return False
 
     def compare_and_match(self):
         """This method compares source and replica paths, finds
-        1) Files that are not matching, that are needs to be removed from replica path, and needs to be copied
-        from source path to replica path
-        2) Finds the files that have identical filename --intersection-- and checks their content
-        3) Find
-
-
+        1) Files that have not identical filename, that are needs to be removed from replica path,
+        and needs to be copied from source path to replica path
+        2) Files that have identical filename -- for this case it checks file content
+        3) Prints out the metadata of source path in replica directory, once script is run once the source path
+        information will be printed to replica, when this is available there is no need to scan the replica
+        again.This is implemented in order to reduce the order of complexity
          """
-        # print('source', path_source)
-        # print('target', path_target)
-        # source_files_dir_path = []
-        # target_files_dir_path = []
-        # source_files_dir = os.listdir(path_source)
-        # target_files_dir = os.listdir(path_target)
-
         # Create an empty set to add dirnames+filename after
         source_files_dir = set()
         target_files_dir = set()
@@ -356,36 +343,29 @@ class FolderSync:
         diff_to_copy = set()
 
         # Check metadata exists
-        meta = os.path.isfile(os.path.join(self.path_replica, 'metadata.txt'))
-
-        if meta:
+        meta_exists = os.path.isfile(os.path.join(self.path_replica, 'metadata.txt'))
+        if meta_exists:
             target_metadata_info = self._read_metadata(os.path.join(self.path_replica, 'metadata.txt'))
-            print('the metadata from previous run', target_metadata_info)
-            print('META VAR META VARRRRRRR')
 
         # Check the source and replica paths and add dirnames+filenames to relevant sets
         for source_dirpath, dirnames, filenames in os.walk(self.path_source):
             for source_filename in filenames:
                 # In case the log file defined in source path, we do not want to involve it into loop
-                if os.path.join(self.path_source,source_filename) == self.log_file_path:
+                if os.path.join(self.path_source, source_filename) == self.log_file_path:
                     continue
-                # Define the dirname
                 relative_dir_source = os.path.relpath(source_dirpath, self.path_source)
                 # Define the dirname+filename, add it to set
                 relative_path_source = os.path.normpath(os.path.join(relative_dir_source, source_filename))
                 source_files_dir.add(relative_path_source)
-                if meta:
-                    # If the source path does exist in meta
-                    # print(f'relative_path_source {relative_path_source}')
-                    # print(f'relative_path_type {type(relative_path_source)}')
-                    # print(f'metadata_path_keys {target_metadata_info.keys()}')
-                    # If the source path does exist in meta that means it is in target directory
+                if meta_exists:
                     if relative_path_source in set(target_metadata_info.keys()):
+                        print(
+                            f' modify info {target_metadata_info[relative_path_source]} {os.path.getmtime(os.path.join(source_dirpath, source_filename))}')
                         # If modification times does not match, that means it is changed in source directory, so copy it
-                        print(f' modify info {target_metadata_info[relative_path_source]} {os.path.getmtime(os.path.join(source_dirpath, source_filename))}' )
                         if not float(target_metadata_info[relative_path_source]) == float(
                                 os.path.getmtime(os.path.join(source_dirpath, source_filename))):
                             diff_to_copy.add(relative_path_source)
+
                             print(f'META modification --- {relative_path_source} will be copied')
                     # If the source path does not exist in meta
                     else:
@@ -395,12 +375,12 @@ class FolderSync:
                                                           os.path.join(self.path_replica, relative_path_source)):
                             diff_to_copy.add(relative_path_source)
                             print(f'META --- {relative_path_source} will be copied')
-                # If meta does not exist, create meta
+                # If meta does not exist, create meta TODO and copy to replica path
                 else:
                     source_metadata_info[relative_path_source] = os.path.getmtime(
                         os.path.join(source_dirpath, source_filename))
 
-        if not meta:
+        if not meta_exists:
             # If metadata does not exist/missing we dont need any information about history
             # program needs to start from scratch
             for target_dirpath, dirnames, target_filenames in os.walk(self.path_replica):
@@ -408,17 +388,10 @@ class FolderSync:
                     # In case logfile defined into target path, we do not want to involve it into loop
                     if os.path.join(self.path_replica, target_filename) == self.log_file_path:
                         continue
-                    # Define the dirname
                     relative_dir_target = os.path.relpath(target_dirpath, self.path_replica)
                     # Define the dirname+filename, add it to set
                     relative_path_target = os.path.normpath(os.path.join(relative_dir_target, target_filename))
                     target_files_dir.add(relative_path_target)
-                    # target_metadata_info[relative_path_target] = os.path.getmtime(
-                    #    os.path.join(target_dirpath, target_filename))
-
-            # TODO metadata for the copied files
-            # If metadata does not exist/missing we dont need any information about history
-            # program needs to start from scratch
 
             # Find the files that only exist in the source path, does not exist in source path, and exist both of them
             diff_to_copy = source_files_dir.difference(target_files_dir)
@@ -427,51 +400,34 @@ class FolderSync:
 
             # This section checks whether the files that have the same filename have the same context
             for file in intersection:
-                # In case user have the logfile in source path, we might not want to copy that
-                #if os.path.join(self.path_source, file) == self.log_file_path:
-                #    continue
                 # Check whether files are matching
                 if not self._check_files_matching(os.path.join(self.path_source, file),
                                                   os.path.join(self.path_replica, file)):
-                    # A file has been found to copy
                     diff_to_copy.add(file)
         else:
-            # if len(target_metadata_info) > len(source_files_dir):
-            print(f'META var REMOVEEE')
-            print(source_files_dir)
             diff_to_remove = set(target_metadata_info.keys()).difference(source_files_dir)
 
-
-        print('diff_to_copy', diff_to_copy, len(diff_to_copy))
-        print('diff_to_remove', diff_to_remove, len(diff_to_remove))
-        print()
-        print('source_metadata_when_there is no metadata', source_metadata_info, len(source_metadata_info))
         for file_to_copy in diff_to_copy:
-            if (os.path.join(self.path_source,file_to_copy) == self.log_file_path) or (os.path.join(self.path_replica,file_to_copy) == self.log_file_path):
+            if (os.path.join(self.path_source, file_to_copy) == self.log_file_path) or (
+                    os.path.join(self.path_replica, file_to_copy) == self.log_file_path):
                 continue
-            #if os.path.join(self.)
             # If there is no metadata, that means we can assume replica folder is empty.
             # Everything that is copied from source to replica will be to content of source file
             print('file to copy', file_to_copy)
-            # TODO metadata olmadigi zaman ne yapacaksin?
             if file_to_copy in source_metadata_info.keys():
                 data = source_metadata_info[file_to_copy]
                 self._log_metadata(file_to_copy, data, os.path.join(self.path_replica, 'metadata.txt'))
             self._copy_file(os.path.join(self.path_source, file_to_copy), os.path.join(self.path_replica, file_to_copy))
-            # self._log(f'The file {os.path.join(path_source, file_to_copy)}',self.log_file_path)
 
         for file_to_remove in diff_to_remove:
             self._remove_file(os.path.join(self.path_replica, file_to_remove))
 
         return diff_to_copy, diff_to_remove
-        # for intersection remove from the replica first, then copy from the source
-        #
 
     @staticmethod
     def _check_files_matching(file_1, file_2):
-        # print('file1', file_1)
-        # print('file2', file_2)
-        # To open the file only-read mode with encoding='utf-8' has been tried but failed
+        # First, to open the file only-read mode with encoding='utf-8' has been tried but failed
+        # Due to that rb action is chosen
         with open(file_1, 'rb') as f1:
             with open(file_2, 'rb') as f2:
                 if md5(f1.read()).hexdigest() == md5(f2.read()).hexdigest():
@@ -494,20 +450,6 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-def remove_all_dir_and_subdir(folder):
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                rmtree(file_path)
-        except Error as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-        except OSError as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-
 def main():
     while True:
         parser = ArgumentParser(prog='SyncFolder',
@@ -525,31 +467,17 @@ def main():
         obj1 = FolderSync(args.path_source, args.path_replica, args.sync_interval, args.log_file_path)
         obj1.check_sys_args()
         break
-        #if not obj1.check_sys_args():
-        #    break
-        #else:
-        #    exit(-1)
 
     print(f"{Colors.OKGREEN}INFO: System arguments passed the test successfully{Colors.ENDC}")
-    # exit()
-    print(obj1.__dict__)
 
-    print('\n')
 
     obj2 = GenerateRandom(obj1.path_source, obj1.path_replica)
-    #[count_source_files, count_source_dire],[count_target_files, count_target_dirs],intersection_list_generate_random = obj2.run(max_depth=3, max_files=4, max_dirs=3)
-    #print(f'count_source_files {count_source_files}  count_source_dire {count_source_dire} count_target_files {count_target_files} count_target_dirs {count_target_dirs}')
-    #exit()
+    if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0)\
+            or(obj2.count_files_dirs_recurs(obj1.path_source)[0]) == 0:
+        obj2.run(max_depth=2, max_files=4, max_dirs=3)
 
-    # print(f'source_files {count_source_files} count_source_dirs {count_source_dire} count_target_files {count_target_files}, count_target_dirs {count_target_dirs}' )
+    obj1.log(f' ---- Start of synchronization ---- ', obj1.log_file_path, 'cyan')
 
-    # TODO in the while main loop check that folders are still exist
-    # TODO to control the metafile os.stat('path')#
-    # TODO metafile routine check metafile at replica, read the timestamp, check the files that are modified at source
-    # TODO that are modified after metafile timestamp, for each file, check whether they exist at replica, if does compare
-    # TODO the content, delete any file that is in replica which is not exist at source
-
-    # at
     while True:
 
         if not os.path.isdir(obj1.path_source):
@@ -558,33 +486,19 @@ def main():
 
         elif not os.path.isdir(obj1.path_replica):
             obj1.log(f' The source path {obj1.path_replica} does not exist anymore', obj1.log_file_path, 'red')
-            break  # TODO change this to continue later
+            break
+
+        obj1.log(f' ---- Start of cycle --- ', obj1.log_file_path, 'blue')
 
         copy_results, remove_results = obj1.compare_and_match()
-        if remove_results is not None:
-            print('copy in main loop', copy_results, len(copy_results), '\n')
-            print('remove in main loop', remove_results, len(remove_results), '\n')
-            print()
 
-        obj1.log(f' ---- End of cycle, number of files copied: {obj1.count_file_copied}, '
-                 f'number of files deleted: {obj1.count_file_removed}', obj1.log_file_path, 'blue')
+        obj1.log(f' ---- End of cycle, for this cycle number of files copied: {len(copy_results)}, '
+                 f'number of files deleted: {len(remove_results)}\n', obj1.log_file_path, 'blue')
 
         sleep(obj1.sync_interval)
 
-    obj1.log(f' ---- END OF SYNC, number of files copied: {obj1.count_file_copied}, '
-             f'number of files deleted: {obj1.count_file_removed}', obj1.log_file_path, 'cyan')
-
-    #
-    # if len(intersection_set_folder_sync) == len(intersection_list_generate_random):
-    #     pass
-
-    # ------------------------------- REMOVE ALL DIR AND SUBDIR ------------------------#
-    ask = input('Delete or not')
-    if ask == 'y':
-        remove_all_dir_and_subdir(obj1.path_source)
-        remove_all_dir_and_subdir(obj1.path_replica)
-
-    # ------------------------------- REMOVE ALL DIR AND SUBDIR ------------------------#
+    obj1.log(f' ---- End of synchronization, total number of files copied: {obj1.count_file_copied}, '
+             f'total number of files deleted: {obj1.count_file_removed}', obj1.log_file_path, 'cyan')
 
 
 if __name__ == '__main__':
