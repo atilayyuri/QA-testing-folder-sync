@@ -103,7 +103,7 @@ class FolderSync:
         try:
             os.remove(path)
             self.count_file_removed += 1
-            self.log(f' -- Remove -- The file {path} has been deleted from replica', self.log_file_path, 'orange')
+            self.log(f' ---- Remove ---- The file {path} has been deleted from replica', self.log_file_path, 'orange')
         except OSError as e:
             self.log(f' Error removing file {path}: {e} ', self.log_file_path, 'red')
 
