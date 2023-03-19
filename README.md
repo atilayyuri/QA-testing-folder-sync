@@ -27,7 +27,7 @@ Before you get started you'll need to do following step:
 
 ```
 
-The project has two scripts where ```folder_sync.py``` is the main code for the syncronisation, ```create_directories_and_files.py``` is the testing script to test the functionality of the **FolderSync**. **GenerateRandom** is a random file generator, when activated this class runs over the source and replica and directories and populates them based on max_depth, max_files, max_dirs.
+The project has two scripts where ```folder_sync.py``` is the main script for the syncronisation, ```create_directories_and_files.py``` is the testing script to test the functionality of the **FolderSync**. Within ```create_directories_and_files.py```, **GenerateRandom** is a class that creates random files and directories. When activated this class runs over the source and replica and directories and populates them based on the inputs *max_depth*, *max_files*, *max_dirs*.
     
 ```
     max_depth -- defines the maximum number of sub directory levels in a directory
