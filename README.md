@@ -27,7 +27,21 @@ Before you get started you'll need to do following step:
 
 ```
 
-The project has two scripts where ```folder_sync.py``` is the main code for the syncronisation, ```create_directories_and_files.py``` is the testing script to test the functionality of the **FolderSync**
+The project has two scripts where ```folder_sync.py``` is the main code for the syncronisation, ```create_directories_and_files.py``` is the testing script to test the functionality of the **FolderSync**. **GenerateRandom** is a random file generator, when activated this class runs over the source and replica and directories and populates them based on max_depth, max_files, max_dirs.
+    
+```
+    max_depth -- defines the maximum number of sub directory levels in a directory
+    max_files -- defines the maximum number of files in a directory
+    max_dirs -- defines the maximum number of directory in a directory
+
+    To test the ability of the FolderSync class (copy detection, content detection if the filename is same)
+    the random file generator has the following abilities
+
+            Creates a file at path1 with content1
+            Creates a file at path2 with content1 -- basically copies
+            Creates a file at path2 with content2 -- to test the content of the file when file paths in source and
+                                                     replica folder matches
+```                                               
 
 ## Usage
 
@@ -48,7 +62,6 @@ In this case, the class **GenerateRandom** will be activated to populate both so
 obj2.run(max_depth=2, max_files=4, max_dirs=3)
 ```
  
-max_depth define the length of subdirectories in path, max_files defines the possible max number of files in path, max_dirs defines possible max number of directories in path
 
 
 
