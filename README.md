@@ -49,7 +49,6 @@ To use **FolderSync** you can run the following command
 
 ```
 python folder_sync.py [Path source <string>] [Path replica <string>] [Path log file <string>] [Sync interval <int>]
-
 ```
 
 [Path source <string>] [Path replica <string>] [Path log file <string>] [Sync interval <int>] needs to be defined by the user.
