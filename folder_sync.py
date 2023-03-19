@@ -18,13 +18,17 @@ class FolderSync:
     2) Scan both source and replica, find the difference, copy the difference from source to replica,
     remove the non existent ones from the replica, remove first and then copy the file name matchers but not identical.
 
-    s : number of files in source
-    r : number of files in replica
+    Complexity of os.walk(), since it is a generator it depends on how far you walk the three, however when
+    f:= total number of files within path, s:= total number of directories within path
+     --> O(f+s) --> O(n)
 
-    non-meta run :  O(s^2) +O(r^2) + O(s) + O(r-s) + O(s-r) -- os.walk(s), os.walk(r), meta_write(s), delete, copy
-    metarun run :   O(s^2) + O(s) + O(r-s) + O(s-r) -- os.walk(s), meta_write(s) , delete, copy
+    s : total number of files + total number of directories in source
+    r : total number of files + total number of directories in replica
 
-    metarun is   O(r^2) is faster
+    worst case non-meta run :  O(s) + O(r) + O(s) + O(r-s) + O(s-r)- os.walk(s), os.walk(r), meta_write(s), delete, copy
+    worst case metarun run :  O(s) + O(s) + O(r-s) + O(s-r) -- os.walk(s), meta_read(s) , delete, copy
+
+    metarun is   O(r) is faster
 
     """
 
@@ -272,6 +276,8 @@ def main():
     obj2 = GenerateRandom(obj1.path_source, obj1.path_replica)
     if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0) \
             or (obj2.count_files_dirs_recurs(obj1.path_source)[0]) == 0:
+        # max_depth define the length of subdirectories in path, max_files defines the possible max number of
+        # files in path , max_dirs defines possible max number of directories in path
         obj2.run(max_depth=2, max_files=4, max_dirs=3)
 
     obj1.log(f' ---- Start of synchronization ---- ', obj1.log_file_path, 'cyan')
