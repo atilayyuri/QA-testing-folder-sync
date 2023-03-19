@@ -3,6 +3,7 @@ import random
 import string
 from shutil import copy2
 from datetime import datetime
+from platform import system
 
 
 class GenerateRandom:
@@ -132,7 +133,10 @@ class GenerateRandom:
                         # krnvnipivh\pswqloakqm\gipvrelcnr\rivoqxmvgj.txt
                         dirnames_and_file = os.path.join(os.path.relpath(target_path, self.path_source), filename)
                         if dirnames_and_file[0:2] == '..':
-                            dirnames_and_file = os.path.join(*dirnames_and_file.split('\\')[2:])
+                            if system == 'Windows':
+                                dirnames_and_file = os.path.join(*dirnames_and_file.split(os.sep)[2:])
+                            elif (system == 'Linux') or (system == 'Darwin'):
+                                dirnames_and_file = os.path.join(*dirnames_and_file.split(os.sep)[2:])
 
                         self.intersection_list.append(dirnames_and_file)
 
@@ -152,7 +156,10 @@ class GenerateRandom:
 
                         dirnames_and_file = os.path.join(os.path.relpath(target_path, self.path_source), filename)
                         if dirnames_and_file[0:2] == '..':
-                            dirnames_and_file = os.path.join(*dirnames_and_file.split('\\')[2:])
+                            if system == 'Windows':
+                                dirnames_and_file = os.path.join(*dirnames_and_file.split(os.sep)[2:])
+                            elif (system == 'Linux') or (system == 'Darwin'):
+                                dirnames_and_file = os.path.join(*dirnames_and_file.split(os.sep)[2:])
 
                         self.intersection_list.append(dirnames_and_file)
 

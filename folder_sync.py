@@ -8,7 +8,8 @@ from time import sleep
 from shutil import copy2
 from enum import Enum
 
-os.system('color')
+if system() == 'Windows':
+    os.system('color')
 
 
 class FolderSync:
@@ -83,7 +84,7 @@ class FolderSync:
         path2_directories = ''
         if system() == 'Windows':
             path2_directories = 'C:\\' + (os.path.join(*path2.split('\\')[1:-1]))
-        elif system() == 'Linux':
+        elif (system() == 'Linux') or (system() == 'Darwin') :
             path2_directories = os.path.join(*path2.split('/')[:-1])
 
         try:
