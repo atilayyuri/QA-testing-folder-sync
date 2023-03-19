@@ -12,6 +12,8 @@ The program maintains a full, identical copy of the source folder at the replica
 
 ## Prerequisites
 
+This program has beeen developed in Windows, tested on Windows, Linux and Darwin. Hence, one should consider before running the code.
+
 The libraries that are used in this program comes as build-in libraries. You do not need to install any additional libraries. However, ensure that you have [Python](https://www.python.org/downloads/) Version >= 3.6.
 
 Before you get started you'll need to do following step:
