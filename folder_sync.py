@@ -83,9 +83,9 @@ class FolderSync:
         """This method handles error if for any reason shutil.copy2 fails, logs out to the logfile and console"""
         path2_directories = ''
         if system() == 'Windows':
-            path2_directories = 'C:\\' + (os.path.join(*path2.split('\\')[1:-1]))
+            path2_directories = (path2.split(os.sep)[0])+ os.sep + (os.path.join(*path2.split(os.sep)[1:-1]))
         elif (system() == 'Linux') or (system() == 'Darwin') :
-            path2_directories = os.path.join(*path2.split('/')[:-1])
+            path2_directories = os.path.join(*path2.split(os.sep)[:-1])
 
         try:
             if not os.path.exists(path2_directories):
