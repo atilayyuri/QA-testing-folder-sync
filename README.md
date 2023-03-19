@@ -14,6 +14,10 @@ The program maintains a full, identical copy of the source folder at the replica
 
 The libraries that are used in this program comes as build-in libraries. You do not need to install any additional libraries. However, ensure that you have [Python](https://www.python.org/downloads/) Version >= 3.6.
 
+Before you get started you'll need to do following step:
+
+- Clone this repository to your local machine using 'git clone https://github.com/atilayyuri/QA-testing-folder-sync.git'
+
 ## Usage
 
 To use **FolderSync** you can run the following command
@@ -37,25 +41,10 @@ max_depth define the length of subdirectories in path, max_files defines the pos
 
 
 
-Before you get started you'll need to do following steps:
-
-- Clone this repository to your local machine using 'git clone https://github.com/atilayyuri/QA-testing-folder-sync.git'
 
 
-## Workflow
-On every pipeline execution, the code goes through the following steps:
 
-1. Code is cloned from this repository, built, tested and analyzed for bugs and bad patterns.
-2. A Docker Container Image is built then published to Docker Container Registry.
-3. If all previous steps finished successfully, the pipeline is paused for the approval to continue to the deployment.
-4. If approved, the container image is deployed in a fresh new container in related K8s namespace.
 
-Targeted release version for the Python package and Docker image is set in the `target-version.json` file in the `app` directory.
-Three tags were used as suffixes to separate the packages: dev (development), rc (release candidate), and no suffix (release).
-
-- Any pipeline running from not main branches (a.k.a. feature/bug fix branches) builds the Python package and Docker image with the `<target-version>-dev-<uuid>` tag, then publishes the Docker image to registry and deploys it to `dev` namespace on the K8s cluster.
-- Any pipeline running from the main branch builds the Python package and Docker image with the `<target-version>-rc-<uuid>` , then publishes the Docker image to registry and deploys it to `rc` namespace on the K8s cluster.
-- Any pipeline running from git tag builds the Python package and Docker image with the `<target-version>` tag, then publishes the Docker image to registry and deploys it to `prod` namespace on the K8s cluster.
 
 
 
