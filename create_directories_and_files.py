@@ -43,6 +43,7 @@ class GenerateRandom:
         path_1 = self.path_source
         path_2 = self.path_replica
 
+
         self.generate_random_directories(path_1, path_2, max_depth, max_files, max_dirs)
 
         return self.count_files_dirs_recurs(path_1), self.count_files_dirs_recurs(path_2), self.intersection_list
@@ -105,6 +106,9 @@ class GenerateRandom:
             with open(os.path.abspath(os.path.join(target_path, filename)), 'w') as f:
                 f.write(content)
 
+            if target_path == target_path_2:
+                continue
+
             # Write another file with different content but with same filename at path2 based on probability
             dice_roll = random.randint(10, 100)
             if dice_roll > 40:
@@ -159,12 +163,12 @@ class GenerateRandom:
         """
         paths = [path_1, path_2]
 
-        if max_depth == 0:
+        if (max_depth == 0) or max_dirs == 0:
             # Write random files at source or replica path
             # Check if max file is reached at source
             if self.count_files_dirs(self.path_source, )[0] < max_files:
                 self._generate_random_files(self.path_source, self.path_replica, random.randint(0, max_files))
-            else:
+            elif path_1 != path_2:
                 # Check if max file is reached at replica path
                 if self.count_files_dirs(self.path_replica, )[0] < max_files:
                     self._generate_random_files(self.path_replica, self.path_replica, random.randint(0, max_files))
