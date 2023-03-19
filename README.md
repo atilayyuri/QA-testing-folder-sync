@@ -60,17 +60,16 @@ In this case, the class **GenerateRandom** will be activated to populate both so
 ```
 obj2.run(max_depth=2, max_files=4, max_dirs=3)
 ```
- 
-
-
-
-
-
-
-
-
-
-
-
-
+    
+## Workflow
+    
+On each execution the code goes throug the following steps
+    
+1) Checks the command-line arguments
+2) Starts the synchronization cycle
+--* Reads the directories and files in the source folder
+--* Reads the directories and files in the replica folder
+..* Synchronizes the two folders, logs any file that is created/copied/deleted to the log file and console output
+3) When synchronization interval is completed, starts the synchronisation cycle again
+    
 
