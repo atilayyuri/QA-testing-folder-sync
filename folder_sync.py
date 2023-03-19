@@ -6,6 +6,7 @@ from create_directories_and_files import GenerateRandom
 from datetime import datetime
 from time import sleep
 from shutil import copy2
+from enum import Enum
 
 os.system('color')
 
@@ -47,17 +48,17 @@ class FolderSync:
         with open(filename, 'a') as f:
             f.write(f'[ {current_time} ] {log_string} \n')
         if key == 'red':
-            print(f'{Colors.FAIL} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.FAIL.value} {current_time} {log_string} {Colors.ENDC.value}')
         elif key == 'green':
-            print(f'{Colors.OKGREEN} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.OKGREEN.value} {current_time} {log_string} {Colors.ENDC.value}')
         elif key == 'blue':
-            print(f'{Colors.OKBLUE} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.OKBLUE.value} {current_time} {log_string} {Colors.ENDC.value}')
         elif key == 'cyan':
-            print(f'{Colors.OKCYAN} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.OKCYAN.value} {current_time} {log_string} {Colors.ENDC.value}')
         elif key == 'orange':
-            print(f'{Colors.WARNING} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.WARNING.value} {current_time} {log_string} {Colors.ENDC.value}')
         elif key == 'bold':
-            print(f'{Colors.BOLD} {current_time} {log_string} {Colors.ENDC}')
+            print(f'{Colors.BOLD.value} {current_time} {log_string} {Colors.ENDC.value}')
 
     @staticmethod
     def _log_metadata(path, data, filename):
@@ -83,7 +84,7 @@ class FolderSync:
         if system() == 'Windows':
             path2_directories = 'C:\\' + (os.path.join(*path2.split('\\')[1:-1]))
         elif system() == 'Linux':
-            path2_directories = os.path.join(*path2.split('/')[1:-1])
+            path2_directories = os.path.join(*path2.split('/')[:-1])
 
         try:
             if not os.path.exists(path2_directories):
@@ -127,8 +128,7 @@ class FolderSync:
             raise ValueError(f"Given input {self.log_file_path} is a directory, please provide full path for log file")
         else:
             if os.path.exists(self.log_file_path):
-                print(
-                    f'{Colors.WARNING}WARNING: Logfile path {self.log_file_path} exists new log will be append to existing file{Colors.ENDC}')
+                self.log(f' WARNING: Logfile path {self.log_file_path} exists new log will be append to existing file', self.log_file_path, 'orange')
 
         if self.sync_interval < 0:
             raise ValueError(f"Synchronisation interval {self.sync_interval} must be positive integer")
@@ -241,7 +241,7 @@ class FolderSync:
                     return False
 
 
-class Colors:
+class Colors(Enum):
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -271,7 +271,8 @@ def main():
         obj1.check_sys_args()
         break
 
-    print(f"{Colors.OKGREEN}INFO: System arguments passed the test successfully{Colors.ENDC}")
+
+    obj1.log(f' INFO: System arguments passed the test successfully', obj1.log_file_path, 'green')
 
     obj2 = GenerateRandom(obj1.path_source, obj1.path_replica)
     if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0) \
