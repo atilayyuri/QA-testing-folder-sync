@@ -22,8 +22,8 @@ Before you get started you'll need to do following step:
 
 ```
 .
-├── folder_sync/
-└── create_directories_and_files/
+├── folder_sync.py
+└── create_directories_and_files.py
 
 ```
 
