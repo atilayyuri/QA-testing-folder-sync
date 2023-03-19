@@ -49,17 +49,17 @@ class FolderSync:
         with open(filename, 'a') as f:
             f.write(f'[ {current_time} ] {log_string} \n')
         if key == 'red':
-            print(f' {Colors.FAIL.value} {current_time} ERROR: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.FAIL.value} {current_time} ERROR:{log_string} {Colors.ENDC.value}')
         elif key == 'green':
-            print(f' {Colors.OKGREEN.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.OKGREEN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
         elif key == 'blue':
-            print(f'{Colors.OKBLUE.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.OKBLUE.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
         elif key == 'cyan':
-            print(f'{Colors.OKCYAN.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.OKCYAN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
         elif key == 'orange':
-            print(f' {Colors.WARNING.value} {current_time} WARNING: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.WARNING.value} {current_time} WARNING:{log_string} {Colors.ENDC.value}')
         elif key == 'bold':
-            print(f'{Colors.BOLD.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.BOLD.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
 
     @staticmethod
     def _log_metadata(path, data, filename):
