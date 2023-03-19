@@ -27,7 +27,7 @@ Before you get started you'll need to do following step:
 
 ```
 
-The project has two scripts where ```folder_sync.py``` is the main code for the syncronisation, ```create_directories_and_files``` is the testing script to test the functionality of the **FolderSync**
+The project has two scripts where ```folder_sync.py``` is the main code for the syncronisation, ```create_directories_and_files.py``` is the testing script to test the functionality of the **FolderSync**
 
 ## Usage
 
