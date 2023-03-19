@@ -49,17 +49,17 @@ class FolderSync:
         with open(filename, 'a') as f:
             f.write(f'[ {current_time} ] {log_string} \n')
         if key == 'red':
-            print(f'{Colors.FAIL.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f' {Colors.FAIL.value} {current_time} ERROR: {log_string} {Colors.ENDC.value}')
         elif key == 'green':
-            print(f'{Colors.OKGREEN.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f' {Colors.OKGREEN.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
         elif key == 'blue':
-            print(f'{Colors.OKBLUE.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.OKBLUE.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
         elif key == 'cyan':
-            print(f'{Colors.OKCYAN.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.OKCYAN.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
         elif key == 'orange':
-            print(f'{Colors.WARNING.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f' {Colors.WARNING.value} {current_time} WARNING: {log_string} {Colors.ENDC.value}')
         elif key == 'bold':
-            print(f'{Colors.BOLD.value} {current_time} {log_string} {Colors.ENDC.value}')
+            print(f'{Colors.BOLD.value} {current_time} INFO: {log_string} {Colors.ENDC.value}')
 
     @staticmethod
     def _log_metadata(path, data, filename):
@@ -129,7 +129,7 @@ class FolderSync:
             raise ValueError(f"Given input {self.log_file_path} is a directory, please provide full path for log file")
         else:
             if os.path.exists(self.log_file_path):
-                self.log(f' WARNING: Logfile path {self.log_file_path} exists new log will be append to existing file', self.log_file_path, 'orange')
+                self.log(f' Logfile path {self.log_file_path} exists new log will be append to existing file', self.log_file_path, 'orange')
 
         if self.sync_interval < 0:
             raise ValueError(f"Synchronisation interval {self.sync_interval} must be positive integer")
@@ -273,7 +273,7 @@ def main():
         break
 
 
-    obj1.log(f' INFO: System arguments passed the test successfully', obj1.log_file_path, 'green')
+    obj1.log(f' System arguments passed the test successfully', obj1.log_file_path, 'green')
 
     obj2 = GenerateRandom(obj1.path_source, obj1.path_replica)
     if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0) \
