@@ -68,8 +68,8 @@ On each execution the code goes throug the following steps
 1. Checks the command-line arguments
 2. Starts the synchronization cycle
     
-    * Reads the directories and files in the source folder
-    * Reads the directories and files in the replica folder
+    * Reads the directories and files in the source folder, creates a metadata at replica folder that contains the information about the files and modification times.
+    * Reads the directories and files in the replica folder, or reads the metadata if exists
     * Synchronizes the two folders, logs any file that is created/copied/deleted to the log file and console output
     
 3. When synchronization interval is completed, starts the synchronisation cycle again
