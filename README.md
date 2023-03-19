@@ -65,13 +65,17 @@ obj2.run(max_depth=2, max_files=4, max_dirs=3)
     
 On each execution the code goes throug the following steps
     
-1) Checks the command-line arguments
-2) Starts the synchronization cycle
+1. Checks the command-line arguments
+2. Starts the synchronization cycle
     
-    --* Reads the directories and files in the source folder
-    --* Reads the directories and files in the replica folder
-    ..* Synchronizes the two folders, logs any file that is created/copied/deleted to the log file and console output
+    * Reads the directories and files in the source folder
+    * Reads the directories and files in the replica folder
+    * Synchronizes the two folders, logs any file that is created/copied/deleted to the log file and console output
     
-3) When synchronization interval is completed, starts the synchronisation cycle again
+3. When synchronization interval is completed, starts the synchronisation cycle again
     
+4. And another item.
+
+⋅⋅⋅You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).
+
 
