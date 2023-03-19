@@ -8,7 +8,7 @@ The program maintains a full, identical copy of the source folder at the replica
 - One-way synchronization: After synchronization, the content of the replica folder exactly matches the content of the source folder.
 - Periodic synchronization: Synchronization is performed periodically.
 - Logging: File creation/copying/removal operations are logged to a file and to the console output.
-- Command-line arguments: Folder paths, synchronization interval, and log file path can be provided using command-line arguments.
+- Command-line arguments: Folder paths, synchronization interval, and log file path have to be provided using command-line arguments.
 
 ## Prerequisites
 
@@ -22,8 +22,8 @@ Before you get started you'll need to do following step:
 
 ```
 .
-├── folder_sync/
-└── create_directories_and_files/
+├── folder_sync.py
+└── create_directories_and_files.py
 
 ```
 
