@@ -20,6 +20,8 @@ Before you get started you'll need to do following step:
 
 - Clone this repository to your local machine using 'git clone https://github.com/atilayyuri/QA-testing-folder-sync.git'
 
+For testing however, one should have the ```pytest``` library installed to be able to run ```test_folder_sync.py```
+
 ## Structure
 
 ```
@@ -56,6 +58,8 @@ python folder_sync.py [Path source <string>] [Path replica <string>] [Path log f
 [Path source <string>] [Path replica <string>] [Path log file <string>] [Sync interval <int>] needs to be defined by the user.
 
 If the given *source path* does not contain any directories or files, this means that the intended use case for **FolderSync** is testing. 
+
+Alternatively, one can use ```pytest``` to test **FolderSync**
 
 In this case, the class **GenerateRandom** will be activated to populate both source and replica folders. The inputs of this class can be changed from line 281 of the *folder_sync.py*
 
