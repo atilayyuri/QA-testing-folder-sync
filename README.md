@@ -59,9 +59,9 @@ python folder_sync.py [Path source <string>] [Path replica <string>] [Path log f
 
 If the given *source path* does not contain any directories or files, this means that the intended use case for **FolderSync** is testing. 
 
-Alternatively, one can use ```pytest``` to test **FolderSync**
-
 In this case, the class **GenerateRandom** will be activated to populate both source and replica folders. The inputs of this class can be changed from line 281 of the *folder_sync.py*
+    
+Alternatively, one can use ```pytest``` to test **FolderSync**
 
 ```
 obj2.run(max_depth=2, max_files=4, max_dirs=3)
