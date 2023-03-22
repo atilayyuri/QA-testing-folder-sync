@@ -149,7 +149,7 @@ class FolderSync:
         target_metadata_info = {}
 
         diff_to_copy = set()
-        diff_to_remove_to_append = set()
+        file_content_not_matching = set()
 
         # Check metadata exists
         meta_exists = os.path.isfile(os.path.join(self.path_replica, 'metadata.txt'))
@@ -206,18 +206,21 @@ class FolderSync:
                         if not self._check_files_matching(os.path.join(self.path_source, relative_path_target),
                                                           os.path.join(self.path_replica, relative_path_target)):
                             # If the content is not matching remove
-                            diff_to_remove_to_append.add(relative_path_target)
-                            pass
-                        pass
+                            file_content_not_matching.add(relative_path_target)
+
 
             # Find the files that only exist in the source path, does not exist in source path
             diff_to_copy = source_files_dir.difference(target_files_dir)
+            diff_to_copy = diff_to_copy.union(file_content_not_matching)
             diff_to_remove = (target_files_dir.difference(source_files_dir))
-            diff_to_remove.union(diff_to_remove_to_append)
+            diff_to_remove.union(file_content_not_matching)
             # Metadata should be remove at the beginning of the cycle not the end
             diff_to_remove.remove('metadata.txt')
         else:
             diff_to_remove = set(target_metadata_info.keys()).difference(source_files_dir)
+
+        for file_to_remove in diff_to_remove:
+            self._remove_file(os.path.join(self.path_replica, file_to_remove))
 
         for file_to_copy in diff_to_copy:
             if (os.path.join(self.path_source, file_to_copy) == self.log_file_path) or \
@@ -225,10 +228,9 @@ class FolderSync:
                 continue
             self._copy_file(os.path.join(self.path_source, file_to_copy), os.path.join(self.path_replica, file_to_copy))
 
-        for file_to_remove in diff_to_remove:
-            self._remove_file(os.path.join(self.path_replica, file_to_remove))
 
-        return diff_to_copy, diff_to_remove
+
+        return diff_to_copy, diff_to_remove, file_content_not_matching
 
     @staticmethod
     def _check_files_matching(file_1, file_2):
