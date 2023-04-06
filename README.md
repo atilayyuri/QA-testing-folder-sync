@@ -20,6 +20,8 @@ Before you get started you'll need to do following step:
 
 - Clone this repository to your local machine using 'git clone https://github.com/atilayyuri/QA-testing-folder-sync.git'
 
+For testing however, one should have the ```pytest``` library installed to be able to run ```test_folder_sync.py```
+
 ## Structure
 
 ```
@@ -62,6 +64,9 @@ In this case, the class **GenerateRandom** will be activated to populate both so
 ```
 obj2.run(max_depth=2, max_files=4, max_dirs=3)
 ```
+    
+Alternatively, one can use ```pytest``` to test **FolderSync**
+    
     
 ## Workflow
     
