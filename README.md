@@ -80,6 +80,9 @@ On each execution the code goes throug the following steps
     * Synchronizes the two folders, logs any file that is created/copied/deleted to the log file and console output
     
 3. When synchronization interval is completed, starts the synchronisation cycle again
+
+
+NOTE : IF ANY FILE IS DELETED OR COPIED IN REPLICA FOLDER DURING CYCLE, THE ALGORITHM WILL CONSIDER THAT. HOWEVER, IF ANY CONTENT OF A FILE IS MODIFIED IN REPLICA FOLDER DURING CYCLE, THIS WILL NOT BE CONSIDERED. THAT IS THE TRADE-OFF OF METADATA APPROACH. IT IS STILL VALID DUE TO REQUIREMENTS BEING ONE WAY SYNCHRONIZATION.
     
 
 
