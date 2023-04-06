@@ -6,6 +6,7 @@ from create_directories_and_files import GenerateRandom
 from datetime import datetime
 from time import sleep
 from shutil import copy2
+from shutil import rmtree
 from enum import Enum
 
 if system() == 'Windows':
@@ -34,8 +35,6 @@ class FolderSync:
 
     """
 
-
-class FolderSync:
     def __init__(self, path_source, path_replica, sync_interval, log_file_path):
         self.path_source = path_source
         self.path_replica = path_replica
@@ -74,18 +73,7 @@ class FolderSync:
         level = levels.get(key, '')
         end = colors.get('end', '')
         print(f'{color} {current_time} {level} {log_string} {end}')
-        # if key == 'red':
-        #     print(f'{Colors.FAIL.value} {current_time} ERROR:{log_string} {Colors.ENDC.value}')
-        # elif key == 'green':
-        #     print(f'{Colors.OKGREEN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        # elif key == 'blue':
-        #     print(f'{Colors.OKBLUE.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        # elif key == 'cyan':
-        #     print(f'{Colors.OKCYAN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        # elif key == 'orange':
-        #     print(f'{Colors.WARNING.value} {current_time} WARNING:{log_string} {Colors.ENDC.value}')
-        # elif key == 'bold':
-        #     print(f'{Colors.BOLD.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
+
 
     @staticmethod
     def _log_metadata(path, data, filename):
@@ -176,6 +164,7 @@ class FolderSync:
         target_metadata_info = {}
 
         diff_to_copy = set()
+        diff_to_remove = set()
         file_content_not_matching = set()
 
         # Check metadata exists
@@ -196,6 +185,7 @@ class FolderSync:
                 relative_path_source = os.path.normpath(os.path.join(relative_dir_source, source_filename))
                 source_files_dir.add(relative_path_source)
                 if meta_exists:
+
                     # Check if the source file is already at replica directory
                     if relative_path_source in set(target_metadata_info.keys()):
                         # Check if modification times does not match,
@@ -203,6 +193,10 @@ class FolderSync:
                         if not float(target_metadata_info[relative_path_source]) == float(
                                 os.path.getmtime(os.path.join(source_dirpath, source_filename))):
                             diff_to_copy.add(relative_path_source)
+                            self.log(
+                                f' ---- Info ---- The file {source_filename} both exists in same directories but content is different',
+                                self.log_file_path,
+                                'cyan')
                     # If the source path does not exist in replica directory
                     else:
                         self.log(
@@ -211,10 +205,13 @@ class FolderSync:
                             self.log_file_path, 'bold')
 
                         diff_to_copy.add(relative_path_source)
-                else:
+
+                        if "metadata.txt" in diff_to_remove:
+                            diff_to_remove.remove('metadata.txt')
+                #else:
                     # Create metadata for source folder at replica directory
-                    data = os.path.getmtime(os.path.join(source_dirpath, source_filename))
-                    self._log_metadata(relative_path_source, data, os.path.join(self.path_replica, 'metadata.txt'))
+                data = os.path.getmtime(os.path.join(source_dirpath, source_filename))
+                self._log_metadata(relative_path_source, data, os.path.join(self.path_replica, 'metadata.txt'))
 
         if not meta_exists:
             # If metadata does not exist/missing we dont need any information about history
@@ -233,6 +230,11 @@ class FolderSync:
                         if not self._check_files_matching(os.path.join(self.path_source, relative_path_target),
                                                           os.path.join(self.path_replica, relative_path_target)):
                             # If the content is not matching remove
+                            self.log(
+                                f' ---- Info ---- The file {relative_path_target} both exists in same directories but content is different',
+                                self.log_file_path,
+                                'cyan')
+
                             file_content_not_matching.add(relative_path_target)
 
             # Find the files that only exist in the source path, does not exist in source path
@@ -241,7 +243,9 @@ class FolderSync:
             diff_to_remove = (target_files_dir.difference(source_files_dir))
             diff_to_remove.union(file_content_not_matching)
             # Metadata should be remove at the beginning of the cycle not the end
-            diff_to_remove.remove('metadata.txt')
+            if "metadata.txt" in diff_to_remove:
+                diff_to_remove.remove('metadata.txt')
+
         else:
             diff_to_remove = set(target_metadata_info.keys()).difference(source_files_dir)
 
@@ -289,15 +293,23 @@ def main():
     obj1.log(f' System arguments passed the test successfully', obj1.log_file_path, 'green')
 
     obj2 = GenerateRandom(obj1.path_source, obj1.path_replica)
-    if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0) \
-            or (obj2.count_files_dirs_recurs(obj1.path_source)[0]) == 0:
+    if (obj2.count_files_dirs_recurs(obj1.path_source)[0] == 0):
         # max_depth define the length of subdirectories in path, max_files defines the possible max number of
         # files in path , max_dirs defines possible max number of directories in path
         obj2.run(max_depth=2, max_files=4, max_dirs=3)
 
     obj1.log(f' ---- Start of synchronization ---- ', obj1.log_file_path, 'cyan')
 
+    sync_count = 0
+
     while True:
+
+        if (obj2.count_files_dirs_recurs(obj1.path_replica)[1] != 0 ) and (sync_count == 0) :
+            obj1.log(f' ---- Some files exist at replica path, they will be deleted --- ', obj1.log_file_path, 'orange')
+            rmtree(obj1.path_replica, ignore_errors=False)
+            os.makedirs(obj1.path_replica)
+            sync_count += 1
+
 
         if not os.path.isdir(obj1.path_source):
             obj1.log(f' The source path {obj1.path_source} does not exist anymore', obj1.log_file_path, 'red')
@@ -310,6 +322,7 @@ def main():
         obj1.log(f' ---- Start of cycle --- ', obj1.log_file_path, 'blue')
 
         copy_results, remove_results, file_content_not_matching = obj1.compare_and_match()
+
 
         obj1.log(f' ---- End of cycle, for this cycle number of files copied: {len(copy_results)}, '
                  f'number of files deleted: {len(remove_results)}\n', obj1.log_file_path, 'blue')
