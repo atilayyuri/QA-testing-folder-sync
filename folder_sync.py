@@ -34,6 +34,8 @@ class FolderSync:
 
     """
 
+
+class FolderSync:
     def __init__(self, path_source, path_replica, sync_interval, log_file_path):
         self.path_source = path_source
         self.path_replica = path_replica
@@ -46,20 +48,44 @@ class FolderSync:
     def log(log_string, filename, key):
         """ This method simply logs out a string to log file path by appending and also console output"""
         current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        colors = {
+            'blue': '\033[94m',
+            'cyan': '\033[96m',
+            'green': '\033[92m',
+            'orange': '\033[93m',
+            'red': '\033[91m',
+            'end': '\033[0m',
+            'bold': '\033[4m',
+        }
+
+        levels = {
+            'blue': 'Info:',
+            'cyan': 'Info:',
+            'green': 'Info:',
+            'orange': 'Warning:',
+            'red': 'Error:',
+            'bold': 'Info:', }
+
         with open(filename, 'a') as f:
             f.write(f'[ {current_time} ] {log_string} \n')
-        if key == 'red':
-            print(f'{Colors.FAIL.value} {current_time} ERROR:{log_string} {Colors.ENDC.value}')
-        elif key == 'green':
-            print(f'{Colors.OKGREEN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        elif key == 'blue':
-            print(f'{Colors.OKBLUE.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        elif key == 'cyan':
-            print(f'{Colors.OKCYAN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
-        elif key == 'orange':
-            print(f'{Colors.WARNING.value} {current_time} WARNING:{log_string} {Colors.ENDC.value}')
-        elif key == 'bold':
-            print(f'{Colors.BOLD.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
+
+        color = colors.get(key, '')
+        level = levels.get(key, '')
+        end = colors.get('end', '')
+        print(f'{color} {current_time} {level} {log_string} {end}')
+        # if key == 'red':
+        #     print(f'{Colors.FAIL.value} {current_time} ERROR:{log_string} {Colors.ENDC.value}')
+        # elif key == 'green':
+        #     print(f'{Colors.OKGREEN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
+        # elif key == 'blue':
+        #     print(f'{Colors.OKBLUE.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
+        # elif key == 'cyan':
+        #     print(f'{Colors.OKCYAN.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
+        # elif key == 'orange':
+        #     print(f'{Colors.WARNING.value} {current_time} WARNING:{log_string} {Colors.ENDC.value}')
+        # elif key == 'bold':
+        #     print(f'{Colors.BOLD.value} {current_time} INFO:{log_string} {Colors.ENDC.value}')
 
     @staticmethod
     def _log_metadata(path, data, filename):
@@ -83,8 +109,8 @@ class FolderSync:
         """This method handles error if for any reason shutil.copy2 fails, logs out to the logfile and console"""
         path2_directories = ''
         if system() == 'Windows':
-            path2_directories = (path2.split(os.sep)[0])+ os.sep + (os.path.join(*path2.split(os.sep)[1:-1]))
-        elif (system() == 'Linux') or (system() == 'Darwin') :
+            path2_directories = (path2.split(os.sep)[0]) + os.sep + (os.path.join(*path2.split(os.sep)[1:-1]))
+        elif (system() == 'Linux') or (system() == 'Darwin'):
             path2_directories = os.path.join(*path2.split(os.sep)[:-1])
 
         try:
@@ -129,7 +155,8 @@ class FolderSync:
             raise ValueError(f"Given input {self.log_file_path} is a directory, please provide full path for log file")
         else:
             if os.path.exists(self.log_file_path):
-                self.log(f' Logfile path {self.log_file_path} exists new log will be append to existing file', self.log_file_path, 'orange')
+                self.log(f' Logfile path {self.log_file_path} exists new log will be append to existing file',
+                         self.log_file_path, 'orange')
 
         if self.sync_interval < 0:
             raise ValueError(f"Synchronisation interval {self.sync_interval} must be positive integer")
@@ -180,7 +207,7 @@ class FolderSync:
                     else:
                         self.log(
                             f' ---- Create ---- A new file has been created at source directory '
-                            f'{os.path.join(self.path_source,relative_path_source)}',
+                            f'{os.path.join(self.path_source, relative_path_source)}',
                             self.log_file_path, 'bold')
 
                         diff_to_copy.add(relative_path_source)
@@ -208,7 +235,6 @@ class FolderSync:
                             # If the content is not matching remove
                             file_content_not_matching.add(relative_path_target)
 
-
             # Find the files that only exist in the source path, does not exist in source path
             diff_to_copy = source_files_dir.difference(target_files_dir)
             diff_to_copy = diff_to_copy.union(file_content_not_matching)
@@ -228,8 +254,6 @@ class FolderSync:
                 continue
             self._copy_file(os.path.join(self.path_source, file_to_copy), os.path.join(self.path_replica, file_to_copy))
 
-
-
         return diff_to_copy, diff_to_remove, file_content_not_matching
 
     @staticmethod
@@ -242,18 +266,6 @@ class FolderSync:
                     return True
                 else:
                     return False
-
-
-class Colors(Enum):
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 
 def main():
@@ -273,7 +285,6 @@ def main():
         obj1 = FolderSync(args.path_source, args.path_replica, args.sync_interval, args.log_file_path)
         obj1.check_sys_args()
         break
-
 
     obj1.log(f' System arguments passed the test successfully', obj1.log_file_path, 'green')
 
@@ -298,7 +309,7 @@ def main():
 
         obj1.log(f' ---- Start of cycle --- ', obj1.log_file_path, 'blue')
 
-        copy_results, remove_results = obj1.compare_and_match()
+        copy_results, remove_results, file_content_not_matching = obj1.compare_and_match()
 
         obj1.log(f' ---- End of cycle, for this cycle number of files copied: {len(copy_results)}, '
                  f'number of files deleted: {len(remove_results)}\n', obj1.log_file_path, 'blue')
