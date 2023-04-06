@@ -55,6 +55,8 @@ To use **FolderSync** you can run the following command
 python folder_sync.py [Path source <string>] [Path replica <string>] [Path log file <string>] [Sync interval <int>]
 ```
 
+Warning since this is a one way synchronization script, it is advised to create a new empty folder as replica folder. Otherwise all files at the replica folder will be deleted! 
+
 [Path source <string>] [Path replica <string>] [Path log file <string>] [Sync interval <int>] needs to be defined by the user.
 
 If the given *source path* does not contain any directories or files, this means that the intended use case for **FolderSync** is testing. 
